@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">urbanbus</string>
+    <string name="search_stops">Buscar Paradas</string>
+    <string name="search_lines">Buscar Linhas</string>
+    <string name="home">Início</string>
+    <string name="stops">Paradas</string>
+    <string name="search_icon_description">icone de busca</string>
+    <string name="search_stops_field_help_text">Informe o nome ou endereço da parada</string>
+    <string name="lines">Linhas</string>
+    <string name="search_lines_field_help_text">Informe o nome ou código da linha</string>
+    <string name="direction_line_arrow_description">arrow icon to indicate direction</string>
+    <string name="without_arrival">sem previsão</string>
+    <string name="app_name_image_description">nome do app</string>
 </resources>
