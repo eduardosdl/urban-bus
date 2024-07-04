@@ -13,6 +13,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+// modulo do hilt para a criacao das instancias de cada repository
 @Module
 @InstallIn(SingletonComponent::class)
 class RepositoriesModule {
@@ -24,13 +25,19 @@ class RepositoriesModule {
 
     @Provides
     @Singleton
-    fun provideBusStopRepository(auth: AuthenticateRepository, api: OlhoVivoAPI): BusStopRepository {
+    fun provideBusStopRepository(
+        auth: AuthenticateRepository,
+        api: OlhoVivoAPI
+    ): BusStopRepository {
         return BusStopRepositoryImp(auth, api)
     }
 
     @Provides
     @Singleton
-    fun provideBusLineRepository(auth: AuthenticateRepository, api: OlhoVivoAPI): BusLineRepository {
+    fun provideBusLineRepository(
+        auth: AuthenticateRepository,
+        api: OlhoVivoAPI
+    ): BusLineRepository {
         return BusLineRepositoryImp(auth, api)
     }
 

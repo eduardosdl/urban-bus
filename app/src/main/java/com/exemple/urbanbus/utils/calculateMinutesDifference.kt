@@ -1,16 +1,17 @@
 package com.exemple.urbanbus.utils
 
+// calcula a diferenca para mostrar o tempo que falta para o onibus chegar no card de previsao
 fun calculateMinutesDifference(currentHour: String, arrivalHour: String): Int {
-    val currentHourEmMinutos = convertToMinutes(currentHour)
-    val arrivalHourEmMinutos = convertToMinutes(arrivalHour)
-    val diferencaEmMinutos = arrivalHourEmMinutos - currentHourEmMinutos
+    val currentHourMinutes = convertToMinutes(currentHour)
+    val arrivalHourMinutes = convertToMinutes(arrivalHour)
+    val diffInMinutes = arrivalHourMinutes - currentHourMinutes
 
-    return if (diferencaEmMinutos <= 59) diferencaEmMinutos else -1
+    return if (diffInMinutes <= 59) diffInMinutes else -1
 }
 
-fun convertToMinutes(horario: String): Int {
-    val horas = horario.substring(0, 2).toInt()
-    val minutos = horario.substring(3, 5).toInt()
+fun convertToMinutes(time: String): Int {
+    val hour = time.substring(0, 2).toInt()
+    val minute = time.substring(3, 5).toInt()
 
-    return horas * 60 + minutos
+    return hour * 60 + minute
 }

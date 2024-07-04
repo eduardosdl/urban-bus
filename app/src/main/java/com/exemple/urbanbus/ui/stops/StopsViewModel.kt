@@ -29,9 +29,9 @@ class StopsViewModel @Inject constructor(
         }
     }
 
-    fun getLineArrival(stopCode: String) = viewModelScope.launch {
+    fun getLineArrival(stopCode: Number) = viewModelScope.launch {
         _lineArrival.value = UiState.Loading
-        busStopRepository.getLineArrival(stopCode) {
+        busStopRepository.getStopArrival(stopCode) {
             _lineArrival.value = it
         }
     }

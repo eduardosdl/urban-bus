@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+// modulo do hilt para a criacao automatica da instancia do retrofit
 @Module
 @InstallIn(SingletonComponent::class)
 class ApiModule {

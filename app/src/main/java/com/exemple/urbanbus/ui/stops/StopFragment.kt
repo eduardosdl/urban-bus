@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -44,18 +45,24 @@ class StopFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observer()
+        manageMap()
+
+        val stopData = args.stopBusData
 
         (activity as MainActivity).updateToolbarTitle(
-            getBusStopTitle(args.stopBusData).limitTitleLength(
+            getBusStopTitle(stopData).limitTitleLength(
                 15
             )
         )
 
-        manageMap()
-        viewModel.getLineArrival("700013950")
+        viewModel.getLineArrival(stopData.code)
 
-        binding.stopLocation.text = args.stopBusData.address
-        binding.arrivelList.adapter = arrivalAdapter
+        binding.stopLocation.text = stopData.address
+        binding.arrivalList.adapter = arrivalAdapter
+
+        binding.tryAgainBtn.setOnClickListener {
+            viewModel.getLineArrival(stopData.code)
+        }
     }
 
     override fun onDestroy() {
@@ -82,14 +89,57 @@ class StopFragment : Fragment(), OnMapReadyCallback {
 
     private fun observer() {
         viewModel.lineArrival.observe(viewLifecycleOwner) { state ->
-            when(state) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    arrivalAdapter.setBusStopArrivalList(state.data)
+            when (state) {
+                is UiState.Loading -> {
+                    binding.loading.root.visibility = View.VISIBLE
                 }
-                is UiState.Failure -> {}
-            }
 
+                is UiState.Success -> {
+                    binding.apply {
+                        imageError.visibility = View.GONE
+                        tryAgainBtn.visibility = View.GONE
+                        arrivalList.visibility = View.VISIBLE
+                        arrivalTitle.visibility = View.VISIBLE
+                    }
+                    arrivalAdapter.setBusStopArrivalList(state.data)
+                    binding.loading.root.visibility = View.GONE
+                }
+
+                is UiState.Failure -> {
+                    binding.apply {
+                        imageError.visibility = View.VISIBLE
+                        tryAgainBtn.visibility = View.VISIBLE
+                        arrivalList.visibility = View.GONE
+                        arrivalTitle.visibility = View.GONE
+                    }
+
+                    when (state) {
+                        is UiState.Failure.NetworkError -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.network_error_warning), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is UiState.Failure.HttpError -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.http_error_warning), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is UiState.Failure.UnknownError -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.unknown_error_warning), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    }
+                    binding.loading.root.visibility = View.GONE
+                }
+
+            }
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.exemple.urbanbus.ui.home
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.exemple.urbanbus.R
-import com.exemple.urbanbus.adapters.MarkerIconConverter
 import com.exemple.urbanbus.adapters.BusStopAdapter
+import com.exemple.urbanbus.adapters.MarkerIconConverter
 import com.exemple.urbanbus.data.models.BusStop
 import com.exemple.urbanbus.databinding.FragmentHomeBinding
 import com.exemple.urbanbus.utils.UiState
@@ -32,6 +30,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private lateinit var map: GoogleMap
 
+    // adapter para a criacao da lista de paradas
     private val stopAdapter = BusStopAdapter {
         val bundle = Bundle()
         bundle.putParcelable("stopBusData", it)
@@ -43,8 +42,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(layoutInflater)
         return binding.root
@@ -54,7 +52,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         observer()
         customizationBottomSheet()
-        viewModel.authenticate()
+        manageMap()
+        // realiza a chamada para buscar todas as paradas
         viewModel.getAllBusStops()
 
         binding.stopsBtn.setOnClickListener {
@@ -65,10 +64,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             findNavController().navigate(R.id.action_homeFragment_to_searchLinesFragment)
         }
 
-         binding.stopsLists.adapter = stopAdapter
-
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        binding.stopsList.adapter = stopAdapter
     }
 
     override fun onDestroy() {
@@ -76,6 +72,19 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         _binding = null
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+
+        // move a camera para o centro de sao paulo
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(SAO_PAULO_LOCATION, 12f))
+    }
+
+    private fun manageMap() {
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+    // aplica regras a bottom sheet
     private fun customizationBottomSheet() {
         val standardBottomSheet = binding.bottomSheet
         val standardBottomSheetBehavior = BottomSheetBehavior.from(standardBottomSheet)
@@ -87,12 +96,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             resources.getDimensionPixelSize(R.dimen.bottom_sheet_max_height)
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(SAO_PAULO_LOCATION, 12f))
-    }
-
+    // realiza a adicao dos pinos no mapa
     private fun addMarkers(busStops: List<BusStop>) {
         for (busStop in busStops) {
             val position = LatLng(busStop.latitude, busStop.longitude)
@@ -108,15 +112,65 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun observer() {
         viewModel.stops.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UiState.Loading -> {}
+                is UiState.Loading -> {
+                    binding.loading.root.visibility = View.VISIBLE
+                    binding.linesBtn.isEnabled = false
+                    binding.stopsBtn.isEnabled = false
+                }
+
                 is UiState.Success -> {
+                    // ativa os botoes de interacao e mostra a lista de paradas
+                    binding.apply {
+                        stopsList.visibility = View.VISIBLE
+                        stopsBtn.visibility = View.VISIBLE
+                        linesBtn.visibility = View.VISIBLE
+                        errorImage.visibility = View.GONE
+                        tryAgainBtn.visibility = View.GONE
+                        linesBtn.isEnabled = true
+                        stopsBtn.isEnabled = true
+
+                    }
                     addMarkers(state.data)
                     stopAdapter.setStopList(state.data)
-                    Log.d("test", "data: ${state.data.size}")
+                    binding.loading.root.visibility = View.GONE
                 }
 
                 is UiState.Failure -> {
-                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
+                    // desativa os botoes de interacao e esconde a lista de paradas
+                    binding.apply {
+                        stopsList.visibility = View.GONE
+                        stopsBtn.visibility = View.GONE
+                        linesBtn.visibility = View.GONE
+                        errorImage.visibility = View.VISIBLE
+                        tryAgainBtn.visibility = View.VISIBLE
+                        tryAgainBtn.setOnClickListener {
+                            viewModel.getAllBusStops()
+                        }
+                    }
+
+                    when (state) {
+                        is UiState.Failure.NetworkError -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.network_error_warning), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is UiState.Failure.HttpError -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.http_error_warning), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is UiState.Failure.UnknownError -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.unknown_error_warning), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                    binding.loading.root.visibility = View.GONE
                 }
             }
         }

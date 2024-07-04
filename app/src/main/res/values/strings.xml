@@ -11,4 +11,13 @@
     <string name="direction_line_arrow_description">arrow icon to indicate direction</string>
     <string name="without_arrival">sem previsão</string>
     <string name="app_name_image_description">nome do app</string>
+    <string name="no_network_image_description">telefone sem sinal de wifi</string>
+    <string name="try_again">Tentar novamente</string>
+    <string name="network_error_warning">Verifique sua conexão com a internet</string>
+    <string name="http_error_warning">Houve um erro ao buscar as informações</string>
+    <string name="unknown_error_warning">Ocorreu um erro inesperado</string>
+    <string name="arrival_list_title">Chegando:</string>
+    <string name="try_again_label">Tente novamente mais tarde</string>
+    <string name="search_line_warning">Busque a sua linha</string>
+    <string name="empty_label">Não encontramos nada, faça uma nova busca</string>
 </resources>

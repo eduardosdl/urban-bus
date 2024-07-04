@@ -8,6 +8,15 @@ plugins {
     alias(libs.plugins.safe.args)
 }
 
+secrets {
+    propertiesFileName = "credentials.properties"
+
+    defaultPropertiesFileName = "local.properties"
+
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
+}
+
 android {
     namespace = "com.exemple.urbanbus"
     compileSdk = 34

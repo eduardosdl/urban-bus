@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 
+    // realiza a atualizacao no titulo da tool bar de forma dinamica
     fun updateToolbarTitle(title: String) {
         binding.toolbar.title = title
     }

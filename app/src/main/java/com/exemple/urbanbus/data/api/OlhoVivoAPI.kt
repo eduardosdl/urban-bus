@@ -1,5 +1,6 @@
 package com.exemple.urbanbus.data.api
 
+import com.exemple.urbanbus.data.dtos.BusPostitionDTO
 import com.exemple.urbanbus.data.dtos.BusStopArrivalDTO
 import com.exemple.urbanbus.data.models.BusLine
 import com.exemple.urbanbus.data.models.BusStop
@@ -9,6 +10,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 
+// interface para realizacao de request para api
 interface OlhoVivoAPI {
     @POST("Login/Autenticar")
     suspend fun authenticate(@Query("token") token: String): Response<String>
@@ -30,4 +32,10 @@ interface OlhoVivoAPI {
         @Header("Cookie") cookie: String,
         @Query("termosBusca") busStopCode: String
     ): List<BusLine>
+
+    @GET("Posicao/Linha")
+    suspend fun getBusPosition(
+        @Header("Cookie") cookie: String,
+        @Query("codigoLinha") busStopCode: Int
+    ): BusPostitionDTO
 }

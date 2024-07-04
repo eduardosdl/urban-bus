@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class BusStopLineArrival (
+data class BusStopLineArrival(
     @SerializedName("cl") val code: Int,
     @SerializedName("c") val sign: String,
     @SerializedName("sl") val direction: Int,
