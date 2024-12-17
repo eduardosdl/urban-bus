@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -8,13 +10,11 @@ plugins {
     alias(libs.plugins.safe.args)
 }
 
-secrets {
-    propertiesFileName = "credentials.properties"
+val credentialsPropertiesFile = rootProject.file("credentials.properties")
+val credentialsProperties = Properties()
 
-    defaultPropertiesFileName = "local.properties"
-
-    ignoreList.add("keyToIgnore")
-    ignoreList.add("sdk.*")
+if (credentialsPropertiesFile.exists()) {
+    credentialsProperties.load(credentialsPropertiesFile.inputStream())
 }
 
 android {
@@ -28,6 +28,9 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = credentialsProperties["GOOGLE_MAPS_API_KEY"] as String
+        buildConfigField("String", "API_TOKEN", "\"${credentialsProperties.getProperty("API_TOKEN")}\"")
     }
 
     buildTypes {
@@ -48,6 +51,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 

@@ -31,6 +31,7 @@ Este projeto foi desenvolvido como parte de um desafio para uma vaga de estágio
 
 - Android Studio instalado
 - Chave de API do Google Maps
+- Token da API do (Olho Vivo)[https://www.sptrans.com.br/desenvolvedores/api-do-olho-vivo-guia-de-referencia/]
 
 ### Passo a Passo
 
@@ -46,8 +47,9 @@ Este projeto foi desenvolvido como parte de um desafio para uma vaga de estágio
 
    ```properties
    GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   API_TOKEN=your_olho_vivo_api_token
    ```
-   - caso prefira pode fazer uma copia do arquivo `credentials.properties.sample` e trocar o nome
+   - caso prefira pode fazer uma copia do arquivo `credentials.properties.sample` e altere o nome
 
 5. Sincronize o projeto com o Gradle.
 
